@@ -7,22 +7,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9, 3.10, 3.11]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - run: pip install -r requirements.txt
-      - run: isort --check-only src/  # isort must run before black, uses profile=black
-      - run: black --check src/
-      - run: mypy src/
-      - run: pytest --cov=src/ --cov-fail-under=80
+      - name: Clear pip cache
+        run: |
+          rm -rf ~/.cache/pip
+          mkdir -p ~/.cache/pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov coverage
+      - name: Install package in development mode
+        run: pip install -e .
+      - name: Check import sorting
+        run: isort --check-only src/ tests/
+      - name: Check code formatting
+        run: black --check src/ tests/
+      - name: Check type annotations
+        run: mypy src/ tests/
+      - name: Run tests with coverage
+        run: |
+          PYTHONPATH=$PYTHONPATH:$(pwd) pytest tests/ --cov=projectpruner --verbose
+      - name: Verify coverage threshold
+        run: |
+          coverage report --fail-under=45

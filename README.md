@@ -13,13 +13,24 @@ A Python CLI tool to clean and archive old development projects.
 - Dry-run option to preview changes
 - Simple interface: just `clean` or `archive` a parent directory
 
-## Development Setup
+## Installation
 
 ### Prerequisites
 - Python 3.8 or higher
 - Node.js 22.15.1 or higher
 
-### Quick Start
+### User Installation
+```bash
+git clone https://github.com/antoniojhun/project-pruner.git
+cd project-pruner
+python3 -m venv venv
+source venv/bin/activate  # On Unix/macOS
+# or
+.\venv\Scripts\activate  # On Windows
+pip install -e .
+```
+
+### Development Setup
 1. Clone the repository:
 ```bash
 git clone https://github.com/antoniojhun/project-pruner.git
@@ -40,33 +51,53 @@ source venv/bin/activate  # On Unix/macOS
 
 ### Development Commands
 - `make test` - Run tests
+- `make coverage` - Run tests with coverage report
 - `make lint` - Run linters (ruff, mypy)
 - `make format` - Format code (black, isort)
 - `make clean` - Clean up development artifacts
 - `make pre-commit-test` - Test only the pre-commit hook functionality
 
-## Installation
+## Configuration
 
+Project Pruner supports flexible configuration:
+- By default, it looks for `config.yaml` in your current directory.
+- If not found, it falls back to `~/.projectpruner/config.yaml`.
+- You can also use environment variables.
+
+### Creating a Configuration File
+To create a starter config in your project directory:
 ```bash
-git clone https://github.com/antoniojhun/project-pruner.git
-cd project-pruner
-python3 -m venv venv
-source venv/bin/activate
-pip install -e .
+projectpruner init-config
 ```
 
-## Quick Reference
+### Configuration Options
+The configuration file contains the following sections:
+```yaml
+search_paths:  # Directories to search for old projects
+  - /path/to/search
+exclude_paths: []  # Paths to exclude from search
+archive:
+  archive_dir: /path/to/archives  # Where archives are stored
+  compression: xz  # Compression algorithm (xz or gz)
+  compression_level: 3  # Level of compression
+  date_format: "%Y-%m-%d"  # Format for date in archive names
+clean:
+  patterns:  # Patterns to clean
+    - '**/node_modules'
+    - '**/dist'
+  exclude_patterns: []  # Patterns to exclude from cleaning
+  min_size: 0  # Minimum size in bytes to clean
+```
+
+## Usage
+
+### Quick Reference
 
 | Task | Command |
 |------|---------|
 | Clean old projects | `projectpruner clean /path/to/parent --until=3m` |
 | Archive old projects | `projectpruner archive /path/to/parent --until=6m` |
 | Restore a project | `projectpruner restore /path/to/archive.tar.xz --destination /path/to/restore_dir` |
-
-- `clean` cleans build artifacts in all subdirectories older than the given duration (keeps the folders).
-- `archive` cleans, archives, and removes all subdirectories older than the given duration.
-
-## Usage
 
 ### Clean (Clean Only)
 ```bash
@@ -85,26 +116,15 @@ Cleans, archives, and removes all project folders under `/path/to/parent` not mo
 projectpruner restore /path/to/archive.tar.xz --destination /path/to/restore_dir
 ```
 
-## Compression Support
+### Compression Options
 - `--compress xz` gives best compression (smallest archives, slower)
 - `--compress gz` is fastest (larger archives, but quick)
 
-## Configuration
-
-Project Pruner supports flexible configuration:
-- By default, it looks for `config.yaml` in your current directory.
-- If not found, it falls back to `~/.projectpruner/config.yaml`.
-- You can also use environment variables.
-
-To create a starter config in your project directory:
+### Dry Run Mode
+Add the `--dry-run` flag to any command to preview changes without making them:
 ```bash
-projectpruner init-config
+projectpruner clean /path/to/parent --until=3m --dry-run
 ```
-
-## Requirements
-
-- Python 3.8+
-- Cross-platform support (Linux, macOS, Windows)
 
 ## FAQ
 

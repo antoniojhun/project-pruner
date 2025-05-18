@@ -30,3 +30,22 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
+addopts = "--import-mode=importlib --cov=src/projectpruner"
+
+[tool.coverage.run]
+source = ["src/projectpruner"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 50
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
+    "except ImportError",
+    "raise NameError",
+    "except NameError"
+]

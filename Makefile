@@ -1,4 +1,4 @@
-.PHONY: setup test lint format clean pre-commit-test
+.PHONY: setup test lint format clean pre-commit-test coverage
 
 setup:
 	python -m venv venv
@@ -10,6 +10,10 @@ setup:
 
 test:
 	. venv/bin/activate && pytest tests/ -v
+
+coverage:
+	. venv/bin/activate && PYTHONPATH=$${PYTHONPATH}:. pytest --cov=projectpruner --cov-report=term --cov-report=html tests/
+	@echo "HTML coverage report generated in htmlcov/"
 
 lint:
 	. venv/bin/activate && ruff check src/ tests/
@@ -30,3 +34,4 @@ clean:
 	find . -type f -name "*.pyd" -delete
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
 	find . -type d -name ".coverage" -exec rm -rf {} +
+	rm -rf htmlcov/
