@@ -6,7 +6,7 @@ A Python CLI tool to clean and archive old development projects.
 
 - Prune (clean) project artifacts (`node_modules`, `vendor`, `dist`, etc.) in bulk
 - Archive and remove old projects in one step
-- Compress projects using xz or gz
+- Compress projects using xz (smaller) or gz (faster)
 - Organize archives by date
 - Restore archives to original paths
 - Configurable via YAML or environment variables
@@ -129,13 +129,17 @@ projectpruner clean /path/to/parent --until=3m --dry-run
 ## FAQ
 
 ### What does 'clean' do?
-- The `clean` command cleans project artifacts (node_modules, vendor, dist, build, etc.) in all subdirectories older than the specified duration, but keeps the project directories.
+The `clean` command removes project artifacts (node_modules, vendor, dist, build, etc.) in all subdirectories older than the specified duration, but keeps the project directories.
 
 ### What does 'archive' do?
-- The `archive` command cleans project artifacts, compresses the project, and then removes the original project directory after archiving, for all subdirectories older than the specified duration.
+The `archive` command cleans project artifacts, compresses the project, and then removes the original project directory after archiving, for all subdirectories older than the specified duration.
 
 ### How is project age determined?
-- Project Pruner determines a project's age by the most recently modified file inside the project directory. If any file (including hidden files like `.DS_Store` or files in `node_modules`) was modified recently, the project is considered recent.
+Project Pruner determines a project's age by the most recently modified file inside the project directory. If any file (including hidden files like `.DS_Store` or files in `node_modules`) was modified recently, the project is considered recent.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 

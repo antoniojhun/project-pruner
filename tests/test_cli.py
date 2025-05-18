@@ -1,24 +1,30 @@
 import shutil
-import subprocess
 import tarfile
 import time
 from pathlib import Path
 
+from click.testing import CliRunner
+
+# Import the CLI function directly
+from projectpruner.cli import main
+
 
 def test_cli_help() -> None:
-    result = subprocess.run(["projectpruner", "--help"], capture_output=True, text=True)
-    assert "Usage:" in result.stdout
+    """Test the CLI help command."""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--help"])
+    assert result.exit_code == 0
+    assert "Usage:" in result.output
 
 
 def test_init_config(tmp_path: Path) -> None:
+    """Test the init-config command."""
     config_path = tmp_path / "config.yaml"
-    result = subprocess.run(
-        ["projectpruner", "init-config", str(config_path)],
-        capture_output=True,
-        text=True,
-    )
+    runner = CliRunner()
+    result = runner.invoke(main, ["init-config", str(config_path)])
+    assert result.exit_code == 0
     assert config_path.exists()
-    assert "Created config" in result.stdout
+    assert "Created config" in result.output
 
 
 # The 'find' command was removed from the CLI implementation
@@ -28,6 +34,7 @@ def test_init_config(tmp_path: Path) -> None:
 
 
 def test_archive_and_restore(tmp_path: Path) -> None:
+    """Test archiving and restoring a project."""
     # Setup: create a fake project
     project_dir = tmp_path / "myproject"
     project_dir.mkdir()
@@ -52,20 +59,12 @@ clean:
 """
     config_path.write_text(config_content)
 
-    # Archive without cleaning
+    # Archive using CliRunner
     initial_archives = list(archive_dir.glob("*.tar.*"))
-    result = subprocess.run(
-        [
-            "projectpruner",
-            "--config",
-            str(config_path),
-            "archive",
-            "--until",
-            "1d",
-            str(project_dir),
-        ],
-        capture_output=True,
-        text=True,
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        ["--config", str(config_path), "archive", "--until", "1d", str(project_dir)],
     )
 
     # Allow a moment for file operations to complete
@@ -89,17 +88,17 @@ clean:
         archives = list(archive_dir.glob("*.tar.*"))
 
     # Check if project is archived
-    assert result.returncode == 0, "Command should succeed"
+    assert result.exit_code == 0, "Command should succeed"
     assert archive_dir.exists()
     assert len(archives) > len(initial_archives), "An archive file should be created"
     assert not project_dir.exists(), "Original project directory should be removed"
 
-    # Restore
+    # Restore using CliRunner
     restore_dir = tmp_path / "restored"
     restore_dir.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
+    result = runner.invoke(
+        main,
         [
-            "projectpruner",
             "--config",
             str(config_path),
             "restore",
@@ -107,8 +106,6 @@ clean:
             "--destination",
             str(restore_dir),
         ],
-        capture_output=True,
-        text=True,
     )
 
     # Allow a moment for file operations to complete
@@ -120,7 +117,7 @@ clean:
             tar.extractall(path=restore_dir)
 
     # Check if project is restored
-    assert result.returncode == 0, "Restore command should succeed"
+    assert result.exit_code == 0, "Restore command should succeed"
     assert (
         restore_dir / "myproject" / "file.txt"
     ).exists(), "Project file should be restored"
@@ -133,6 +130,7 @@ clean:
 
 
 def test_clean_command(tmp_path: Path) -> None:
+    """Test the clean command for removing build artifacts."""
     # Setup: create a fake project with a file to clean
     project_dir = tmp_path / "myproject"
     project_dir.mkdir()
@@ -162,19 +160,10 @@ clean:
         project_dir / "node_modules"
     ).exists(), "node_modules should exist before cleaning"
 
-    # Clean command
-    result = subprocess.run(
-        [
-            "projectpruner",
-            "--config",
-            str(config_path),
-            "clean",
-            "--until",
-            "1d",
-            str(project_dir),
-        ],
-        capture_output=True,
-        text=True,
+    # Clean command using CliRunner
+    runner = CliRunner()
+    result = runner.invoke(
+        main, ["--config", str(config_path), "clean", "--until", "1d", str(project_dir)]
     )
 
     # Allow a moment for file operations to complete
@@ -184,7 +173,7 @@ clean:
     if (project_dir / "node_modules").exists():
         shutil.rmtree(project_dir / "node_modules")
 
-    # Check if node_modules is removed
-    assert result.returncode == 0, "Command should succeed"
+    # Check results
+    assert result.exit_code == 0, "Clean command should succeed"
     assert not (project_dir / "node_modules").exists(), "node_modules should be removed"
-    assert (project_dir / "file.txt").exists(), "Project file should remain"
+    assert (project_dir / "file.txt").exists(), "Regular files should not be removed"
