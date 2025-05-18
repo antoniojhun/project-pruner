@@ -1,0 +1,11 @@
+click>=8.0.0
+rich>=10.0.0
+pyyaml>=6.0
+typing-extensions>=4.0.0
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=22.0.0
+isort>=5.0.0
+mypy>=1.0.0
+types-PyYAML
+pre-commit>=3.5.0

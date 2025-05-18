@@ -1,6 +1,6 @@
-# project-pruner
+# Project Pruner
 
-A lightweight Python CLI tool to clean, archive, and manage old development projects for efficient workspace storage optimisation.
+A Python CLI tool to clean and archive old development projects.
 
 ## Features
 
@@ -18,7 +18,6 @@ A lightweight Python CLI tool to clean, archive, and manage old development proj
 ### Prerequisites
 - Python 3.8 or higher
 - Node.js 22.15.1 or higher
-- Git
 
 ### Quick Start
 1. Clone the repository:
@@ -50,7 +49,7 @@ source venv/bin/activate  # On Unix/macOS
 
 ```bash
 git clone https://github.com/antoniojhun/project-pruner.git
-cd projectpruner
+cd project-pruner
 python3 -m venv venv
 source venv/bin/activate
 pip install -e .
