@@ -1,0 +1,34 @@
+{
+  "name": "project-pruner",
+  "version": "0.1.0",
+  "description": "A tool to clean, archive, and manage old development projects",
+  "scripts": {
+    "prepare": "husky install",
+    "test": "pytest tests/",
+    "integration-test": "pytest -xvs tests/integration_test.py",
+    "lint": "ruff check src/ tests/",
+    "format": "black src/ tests/ && isort src/ tests/",
+    "type-check": "mypy src/"
+  },
+  "lint-staged": {
+    "./src/**/*.py": [
+      "black",
+      "isort",
+      "ruff --fix",
+      "mypy"
+    ],
+    "./tests/**/*.py": [
+      "black",
+      "isort",
+      "ruff --fix"
+    ]
+  },
+  "engines": {
+    "node": "22.15.1"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "package-json-validator": "^0.6.3"
+  }
+}

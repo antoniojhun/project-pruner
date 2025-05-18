@@ -1,0 +1,55 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest-cov coverage
+      - name: Verify python environment
+        run: |
+          echo "Python version:"
+          python --version
+          echo "pip version:"
+          pip --version
+          echo "sys.path:"
+          python -c "import sys; print(sys.path)"
+      - name: Install package in development mode
+        run: |
+          pip install -e .
+          echo "After installation sys.path:"
+          python -c "import sys; print(sys.path)"
+          python -c "import projectpruner; print(f'Successfully imported projectpruner')"
+      - name: Check import sorting
+        run: isort --check-only src/ tests/
+      - name: Check code formatting
+        run: black --check src/ tests/
+      - name: Check type annotations
+        run: |
+          # Check source code with strict settings
+          mypy src/ --python-version ${{ matrix.python-version }}
+          # Check tests with more permissive settings
+          mypy tests/ --python-version ${{ matrix.python-version }} --ignore-missing-imports --no-strict-optional --allow-untyped-decorators
+      - name: Run tests with pytest
+        run: |
+          pytest tests/ \
+            --cov=projectpruner \
+            -v
+      - name: Verify coverage threshold
+        run: |
+          coverage report --fail-under=43
