@@ -19,35 +19,28 @@ A Python CLI tool to clean and archive old development projects.
 - Python 3.8 or higher
 - Node.js 22.15.1 or higher
 
-### User Installation
+### Basic Installation
+Clone the repository and install:
 ```bash
 git clone https://github.com/antoniojhun/project-pruner.git
 cd project-pruner
-python3 -m venv venv
-source venv/bin/activate  # On Unix/macOS
-# or
-.\venv\Scripts\activate  # On Windows
-pip install -e .
-```
-
-### Development Setup
-1. Clone the repository:
-```bash
-git clone https://github.com/antoniojhun/project-pruner.git
-cd project-pruner
-```
-
-2. Set up the development environment:
-```bash
 make setup
 ```
 
-3. Activate the virtual environment:
+This will:
+- Create a virtual environment in the `venv` directory
+- Install the package in development mode
+
+### Additional Development Setup
+If you're contributing to the project, run this after the basic installation:
 ```bash
-source venv/bin/activate  # On Unix/macOS
-# or
-.\venv\Scripts\activate  # On Windows
+make dev-setup
 ```
+
+This adds:
+- Development dependencies
+- Pre-commit hooks
+- Node.js dependencies
 
 ### Development Commands
 - `make test` - Run tests
