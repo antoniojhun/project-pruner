@@ -7,7 +7,7 @@ A Python CLI tool to clean and archive old development projects.
 - Prune (clean) project artifacts (`node_modules`, `vendor`, `dist`, etc.) in bulk
 - Archive and remove old projects in one step
 - Compress projects using xz (smaller) or gz (faster)
-- Organize archives by date
+- Organise archives by date
 - Restore archives to original paths
 - Configurable via YAML or environment variables
 - Dry-run option to preview changes
